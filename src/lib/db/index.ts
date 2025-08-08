@@ -127,6 +127,34 @@ function initializeSchema(database: Database.Database) {
     CREATE INDEX IF NOT EXISTS idx_org_sum_org ON organization_summary(organization_id);
     CREATE INDEX IF NOT EXISTS idx_org_sum_date ON organization_summary(date);
   `);
+  
+  // 이상 패턴 테이블
+  database.exec(`
+    CREATE TABLE IF NOT EXISTS anomaly_patterns (
+      id TEXT PRIMARY KEY,
+      employee_id TEXT NOT NULL,
+      date DATE NOT NULL,
+      type TEXT NOT NULL,
+      severity TEXT NOT NULL,
+      description TEXT,
+      start_time DATETIME NOT NULL,
+      end_time DATETIME,
+      duration INTEGER,
+      confidence REAL,
+      details TEXT,
+      resolved BOOLEAN DEFAULT 0,
+      resolved_at DATETIME,
+      resolved_by TEXT,
+      notes TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (employee_id) REFERENCES individuals (employee_id)
+    );
+    
+    CREATE INDEX IF NOT EXISTS idx_anomaly_employee ON anomaly_patterns(employee_id);
+    CREATE INDEX IF NOT EXISTS idx_anomaly_date ON anomaly_patterns(date);
+    CREATE INDEX IF NOT EXISTS idx_anomaly_type ON anomaly_patterns(type);
+    CREATE INDEX IF NOT EXISTS idx_anomaly_severity ON anomaly_patterns(severity);
+  `);
 }
 
 export function closeDatabase() {
