@@ -27,7 +27,7 @@ export function useOrganizations(level: number = 1, parentId?: number) {
 
       const response = await fetch('/api/organizations?' + params.toString());
       
-      if (\!response.ok) {
+      if (!response.ok) {
         throw new Error('Failed to fetch organizations');
       }
 
@@ -43,14 +43,13 @@ export function useOrganization(id: number) {
     queryFn: async () => {
       const response = await fetch('/api/organizations/' + id);
       
-      if (\!response.ok) {
+      if (!response.ok) {
         throw new Error('Failed to fetch organization');
       }
 
       const result = await response.json();
       return result.data;
     },
-    enabled: \!\!id,
+    enabled: !!id,
   });
 }
-ENDOFFILE < /dev/null

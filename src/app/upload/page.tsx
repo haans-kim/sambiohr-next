@@ -71,8 +71,8 @@ export default function UploadPage() {
     },
   ];
 
-  const handleUpload = async (files: File[], type: FileType) => {
-    const results = [];
+  const handleUpload = async (files: File[], type: FileType): Promise<void> => {
+    const results: any[] = [];
     
     for (const file of files) {
       try {
@@ -103,8 +103,6 @@ export default function UploadPage() {
       ...prev,
       [type]: results,
     }));
-
-    return results;
   };
 
   const getColorClass = (color: string) => {

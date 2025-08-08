@@ -26,4 +26,3 @@ export function Providers({ children }: { children: React.ReactNode }) {
     </QueryClientProvider>
   );
 }
-ENDOFFILE < /dev/null

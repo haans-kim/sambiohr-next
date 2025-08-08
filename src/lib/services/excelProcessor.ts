@@ -21,11 +21,22 @@ export class ExcelProcessor {
       const buffer = await file.arrayBuffer();
       const workbook = XLSX.read(buffer, { type: 'array', cellDates: true });
       
+      // Convert all sheets to JSON
+      const sheets: any[] = [];
+      for (const sheetName of workbook.SheetNames) {
+        const worksheet = workbook.Sheets[sheetName];
+        const data = XLSX.utils.sheet_to_json(worksheet);
+        sheets.push({
+          name: sheetName,
+          data,
+        });
+      }
+      
       return {
         success: true,
-        data: workbook,
-        rowCount: 0,
-        columnCount: 0,
+        data: sheets,
+        rowCount: sheets[0]?.data?.length || 0,
+        columnCount: sheets[0]?.data?.[0] ? Object.keys(sheets[0].data[0]).length : 0,
       };
     } catch (error) {
       return {

@@ -79,7 +79,7 @@ export function FileUpload({
         size: file.size,
         type: file.type,
         status: error ? 'error' : 'pending',
-        error,
+        error: error || undefined,
       };
       newFiles.push(uploadedFile);
     }
