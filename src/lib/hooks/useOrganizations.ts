@@ -1,4 +1,6 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+'use client';
+
+import { useQuery } from '@tanstack/react-query';
 
 interface Organization {
   id: number;
@@ -7,53 +9,48 @@ interface Organization {
   group_name?: string;
   level: number;
   parent_id?: number;
+  total_employees?: number;
+  avg_work_time?: number;
+  avg_estimation_rate?: number;
+  performance_score?: number;
 }
 
-async function fetchOrganizations(level?: number, parentId?: number) {
-  const params = new URLSearchParams();
-  if (level !== undefined) params.append('level', level.toString());
-  if (parentId !== undefined) params.append('parentId', parentId.toString());
-  
-  const response = await fetch(`/api/organizations?${params}`);
-  if (!response.ok) {
-    throw new Error('Failed to fetch organizations');
-  }
-  
-  const data = await response.json();
-  return data.data as Organization[];
-}
-
-async function createOrganization(org: Omit<Organization, 'id'>) {
-  const response = await fetch('/api/organizations', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(org),
-  });
-  
-  if (!response.ok) {
-    throw new Error('Failed to create organization');
-  }
-  
-  const data = await response.json();
-  return data.data;
-}
-
-export function useOrganizations(level?: number, parentId?: number) {
-  return useQuery({
+export function useOrganizations(level: number = 1, parentId?: number) {
+  return useQuery<Organization[]>({
     queryKey: ['organizations', level, parentId],
-    queryFn: () => fetchOrganizations(level, parentId),
-  });
-}
+    queryFn: async () => {
+      const params = new URLSearchParams();
+      params.append('level', level.toString());
+      if (parentId) {
+        params.append('parent_id', parentId.toString());
+      }
 
-export function useCreateOrganization() {
-  const queryClient = useQueryClient();
-  
-  return useMutation({
-    mutationFn: createOrganization,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['organizations'] });
+      const response = await fetch('/api/organizations?' + params.toString());
+      
+      if (\!response.ok) {
+        throw new Error('Failed to fetch organizations');
+      }
+
+      const result = await response.json();
+      return result.data || [];
     },
   });
 }
+
+export function useOrganization(id: number) {
+  return useQuery<Organization>({
+    queryKey: ['organization', id],
+    queryFn: async () => {
+      const response = await fetch('/api/organizations/' + id);
+      
+      if (\!response.ok) {
+        throw new Error('Failed to fetch organization');
+      }
+
+      const result = await response.json();
+      return result.data;
+    },
+    enabled: \!\!id,
+  });
+}
+ENDOFFILE < /dev/null
